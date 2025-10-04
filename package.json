@@ -1,0 +1,14 @@
+{
+  "name": "languagebaba-landing-page",
+  "version": "1.0.0",
+  "description": "Language Baba TEF Canada Landing Page",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "build": "echo 'Static site ready'",
+    "start": "python -m http.server 8080"
+  },
+  "keywords": ["tef-canada", "small-batch", "whatsapp", "landing-page"],
+  "author": "Language Baba",
+  "license": "MIT"
+}
