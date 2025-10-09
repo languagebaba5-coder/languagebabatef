@@ -19,7 +19,7 @@ class AdminPanel {
         this.lastActivity = Date.now();
         
         // Device authorization
-        this.deviceFingerprint = 'device_admin_mgize5ru'; // Pre-authorized device for development
+        this.deviceFingerprint = this.generateDeviceFingerprint();
         this.isDeviceAuthorized = false;
         
         this.init();
@@ -85,10 +85,13 @@ class AdminPanel {
                 const devices = await response.json();
                 this.renderDevices(devices);
             } else {
-                console.error('Failed to load devices');
+                const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+                console.error('Failed to load devices:', error);
+                this.showNotification(error.error || 'Failed to load devices', 'error');
             }
         } catch (error) {
             console.error('Error loading devices:', error);
+            this.showNotification('Network error while loading devices', 'error');
         }
     }
 
@@ -2966,28 +2969,34 @@ class AdminPanel {
 
     // Device Authorization Methods
     generateDeviceFingerprint() {
-        // Generate a unique device fingerprint based on various browser characteristics
-        const factors = [
-            navigator.userAgent,
-            navigator.language,
-            navigator.platform,
-            screen.width + 'x' + screen.height,
-            screen.colorDepth,
-            new Date().getTimezoneOffset().toString(),
-            navigator.hardwareConcurrency || 'unknown',
-            navigator.maxTouchPoints || '0'
-        ];
-        
-        // Create a hash from the factors
-        let hash = 0;
-        const str = factors.join('|');
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
+        try {
+            // Generate a unique device fingerprint based on various browser characteristics
+            const factors = [
+                navigator.userAgent,
+                navigator.language,
+                navigator.platform,
+                screen.width + 'x' + screen.height,
+                screen.colorDepth,
+                new Date().getTimezoneOffset().toString(),
+                navigator.hardwareConcurrency || 'unknown',
+                navigator.maxTouchPoints || '0'
+            ];
+            
+            // Create a hash from the factors
+            let hash = 0;
+            const str = factors.join('|');
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            
+            return 'device_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+        } catch (error) {
+            console.warn('Failed to generate device fingerprint, using fallback:', error);
+            // Fallback fingerprint based on timestamp and random number
+            return 'device_fallback_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2);
         }
-        
-        return 'device_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
     }
 
     getAuthHeaders() {

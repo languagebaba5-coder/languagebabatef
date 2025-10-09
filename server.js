@@ -100,10 +100,23 @@ const checkDeviceAuthorization = async (req, res, next) => {
             return next();
         }
 
+        // Skip device check for device management routes (superusers need to manage devices)
+        if (req.path.startsWith('/api/admin/devices') && req.user) {
+            const currentUser = await db.getUserById(req.user.id);
+            if (currentUser && currentUser.role === 'superuser') {
+                return next();
+            }
+        }
+
         // Get device fingerprint from headers
         const deviceFingerprint = req.headers['x-device-fingerprint'];
         const userAgent = req.headers['user-agent'];
-        const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
+        const ipAddress = req.ip || 
+                         req.headers['x-forwarded-for']?.split(',')[0] || 
+                         req.headers['x-real-ip'] || 
+                         req.connection.remoteAddress || 
+                         req.socket.remoteAddress ||
+                         'unknown';
         
         if (!deviceFingerprint) {
             return res.status(403).json({ 

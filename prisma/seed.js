@@ -1,13 +1,12 @@
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('./client');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
-// Set DATABASE_URL if not already set
+// Ensure DATABASE_URL is available from environment variables
 if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'postgresql://vastwk-lbaba:Coj7AuGwucMXC4FF_LQzww@languagebaba-16817.j77.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full';
+  console.error('DATABASE_URL environment variable is required');
+  process.exit(1);
 }
-
-const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting database seeding...');
