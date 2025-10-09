@@ -3,12 +3,29 @@
   "public": true,
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
+    { "src": "blog.html", "use": "@vercel/static" },
     { "src": "privacy.html", "use": "@vercel/static" },
+    { "src": "admin.html", "use": "@vercel/static" },
     { "src": "style.css", "use": "@vercel/static" },
+    { "src": "blog-style.css", "use": "@vercel/static" },
+    { "src": "admin-style.css", "use": "@vercel/static" },
     { "src": "script.js", "use": "@vercel/static" },
+    { "src": "blog-script.js", "use": "@vercel/static" },
+    { "src": "admin-script.js", "use": "@vercel/static" },
+    { "src": "server.js", "use": "@vercel/node" },
+    { "src": "database-prisma.js", "use": "@vercel/node" },
+    { "src": "package.json", "use": "@vercel/node" },
+    { "src": "prisma/**", "use": "@vercel/node" },
     { "src": "public/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/api/(.*)", "dest": "/server.js" },
+    { "src": "/blog.html", "dest": "/blog.html" },
+    { "src": "/privacy.html", "dest": "/privacy.html" },
+    { "src": "/admin.html", "dest": "/admin.html" },
     { "src": "/(.*)", "dest": "/$1" }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
