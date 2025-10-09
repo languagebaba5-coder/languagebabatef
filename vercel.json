@@ -6,18 +6,6 @@
       "use": "@vercel/node"
     },
     {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.js",
-      "use": "@vercel/static"
-    },
-    {
       "src": "public/**",
       "use": "@vercel/static"
     }
@@ -28,20 +16,24 @@
       "dest": "/server.js"
     },
     {
+      "src": "/",
+      "dest": "/public/index.html"
+    },
+    {
       "src": "/blog",
-      "dest": "/blog.html"
+      "dest": "/public/blog.html"
     },
     {
       "src": "/admin",
-      "dest": "/admin.html"
+      "dest": "/public/admin.html"
     },
     {
       "src": "/privacy",
-      "dest": "/privacy.html"
+      "dest": "/public/privacy.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/public/$1"
     }
   ],
   "headers": [
