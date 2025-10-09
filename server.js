@@ -13,9 +13,10 @@ BigInt.prototype.toJSON = function() {
     return Number(this);
 };
 
-// Fallback connection string if .env is not loaded
+// Ensure DATABASE_URL is available from environment variables
 if (!process.env.DATABASE_URL) {
-    process.env.DATABASE_URL = 'postgresql://vastwk-lbaba:Coj7AuGwucMXC4FF_LQzww@languagebaba-16817.j77.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full';
+    console.error('DATABASE_URL environment variable is required');
+    process.exit(1);
 }
 
 const app = express();

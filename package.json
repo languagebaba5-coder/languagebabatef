@@ -5,9 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "prisma generate && next build" ,
+    "build": "prisma generate",
     "dev": "nodemon server.js",
     "test": "jest",
+    "vercel-build": "npx prisma generate",
     "db:setup": "node setup-database.js",
     "db:cockroach": "node setup-cockroachdb.js",
     "db:test": "node test-connection.js",

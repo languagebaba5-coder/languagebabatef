@@ -1,10 +1,16 @@
 const { PrismaClient } = require('@prisma/client');
 
-// Create a singleton instance of PrismaClient
-const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
-  errorFormat: 'pretty'
-});
+// Singleton pattern for serverless environments
+let prisma;
+
+if (!global.prisma) {
+  global.prisma = new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+    errorFormat: 'pretty'
+  });
+}
+
+prisma = global.prisma;
 
 // Example usage function (similar to your provided example)
 async function testConnection() {
@@ -26,19 +32,21 @@ async function testConnection() {
   }
 }
 
-// Handle graceful shutdown
-process.on('beforeExit', async () => {
-  await prisma.$disconnect();
-});
+// Handle graceful shutdown (only in non-serverless environments)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  process.on('beforeExit', async () => {
+    await prisma.$disconnect();
+  });
 
-process.on('SIGINT', async () => {
-  await prisma.$disconnect();
-  process.exit(0);
-});
+  process.on('SIGINT', async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
 
-process.on('SIGTERM', async () => {
-  await prisma.$disconnect();
-  process.exit(0);
-});
+  process.on('SIGTERM', async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+}
 
 module.exports = { prisma, testConnection };
