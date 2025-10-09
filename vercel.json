@@ -1,35 +1,68 @@
 {
   "version": 2,
-  "builds": [
+  "functions": {
+    "server.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/blog.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
     {
-      "src": "server.js",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/server.js"
     },
     {
-      "src": "*.html",
-      "use": "@vercel/static"
+      "source": "/blog-test",
+      "destination": "/blog-test.html"
     },
     {
-      "src": "*.css",
-      "use": "@vercel/static"
+      "source": "/blog-test.html",
+      "destination": "/blog-test.html"
     },
     {
-      "src": "*.js",
-      "use": "@vercel/static"
+      "source": "/blog",
+      "destination": "/api/blog"
     },
     {
-      "src": "public/**",
-      "use": "@vercel/static"
+      "source": "/blog.html",
+      "destination": "/api/blog"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/admin.html",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "/privacy.html"
     }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
     }
   ]
 }
