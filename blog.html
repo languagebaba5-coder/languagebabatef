@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Language Baba | TEF Canada Tips & Success Stories</title>
+    <meta name="description" content="Read our latest blog posts about TEF Canada preparation, French learning tips, Canada immigration success stories, and small batch learning benefits.">
+    <link rel="icon" type="image/png" href="/public/roundlogo.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="blog-style.css">
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1);
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="/public/logotab.png" alt="Language Baba Logo" class="logo-img" style="height:64px; width:150px; border-radius:14px; vertical-align:middle; object-fit:cover;">
+                    <span style="position:absolute;left:-9999px;">Language Baba</span>
+                </div>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="index.html#courses">Courses</a>
+                <a href="blog.html" class="active">Blog</a>
+                <a href="index.html#contact">Contact</a>
+                <a href="#" class="whatsapp-nav" onclick="openWhatsApp('general')">💬 WhatsApp</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">☰</button>
+        </nav>
+    </header>
+
+    <!-- Blog Hero Section -->
+    <section class="blog-hero fade-in-up">
+        <div class="container">
+            <h1>TEF Canada Blog</h1>
+            <p>Expert tips, success stories, and insights for your French learning journey</p>
+        </div>
+    </section>
+
+    <!-- Blog Content -->
+    <section class="blog-content fade-in-up">
+        <div class="container">
+            <div class="blog-layout">
+                <!-- Main Content -->
+                <main class="blog-main">
+                    <div class="blog-filters">
+                        <button class="filter-btn active" data-category="all">All Posts</button>
+                        <button class="filter-btn" data-category="tef-canada">TEF Canada</button>
+                        <button class="filter-btn" data-category="french-learning">French Learning</button>
+                        <button class="filter-btn" data-category="canada-immigration">Canada Immigration</button>
+                        <button class="filter-btn" data-category="tips">Tips & Tricks</button>
+                    </div>
+
+                    <div class="blog-posts" id="blog-posts">
+                        <!-- Blog posts will be loaded here -->
+                    </div>
+
+                    <div class="no-posts" id="no-posts" style="display: none;">
+                        <div class="no-posts-content">
+                            <i class="fas fa-blog" style="font-size: 48px; color: #667eea; margin-bottom: 20px;"></i>
+                            <h3>No blog posts yet</h3>
+                            <p>Check back soon for helpful TEF Canada tips and success stories!</p>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Sidebar -->
+                <aside class="blog-sidebar">
+                    <div class="sidebar-widget">
+                        <h3>Quick Links</h3>
+                        <ul class="quick-links">
+                            <li><a href="index.html#courses">Our Programs</a></li>
+                            <li><a href="index.html#contact">Contact Us</a></li>
+                            <li><a href="#" onclick="openWhatsApp('general')">WhatsApp Support</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="sidebar-widget">
+                        <h3>Why Choose Us?</h3>
+                        <ul class="why-choose">
+                            <li>✅ Only 5-8 students per batch</li>
+                            <li>✅ 95% success rate</li>
+                            <li>✅ Expert instructors</li>
+                            <li>✅ Personalized attention</li>
+                            <li>✅ Proven results</li>
+                        </ul>
+                    </div>
+
+                    <div class="sidebar-widget">
+                        <h3>Get Started</h3>
+                        <p>Ready to start your TEF Canada journey?</p>
+                        <a href="index.html#contact" class="btn btn-primary">Join Our Program</a>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h3>Language Baba</h3>
+                    <p>TEF Canada preparation with exclusive small batches (5-8 students) for personalized attention and guaranteed results. Join 1000+ students who achieved their Canadian dreams.</p>
+                </div>
+                <div>
+                    <h3>Contact Information</h3>
+                    <p><strong>WhatsApp:</strong> +91-7303619158</p>
+                    <p><strong>Email:</strong> languagebaba5@gmail.com</p>
+                    <p><strong>Phone:</strong> +91-7303619158</p>
+                    <p><strong>Website:</strong> <a href="https://languagebaba.live" target="_blank">languagebaba.live</a></p>
+                </div>
+                <div>
+                    <h3>Our Programs</h3>
+                    <p><a href="#" onclick="openWhatsApp('demo')">Demo Class - ₹800</a></p>
+                    <p><a href="#" onclick="openWhatsApp('sevenMonth')">7-Month Program - ₹77,000</a></p>
+                    <p><a href="#" onclick="openWhatsApp('tenMonth')">10-Month Program - ₹80,000</a></p>
+                    <p><a href="https://languagebaba.live" target="_blank">Main Website</a></p>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #555; padding-top: 30px; margin-top: 40px; text-align:center;">
+                <a href="privacy.html" style="color:#2563eb; text-decoration:underline; font-size:15px; margin-right:16px;">Privacy Policy</a>
+                <a href="index.html" style="color:#2563eb; text-decoration:underline; font-size:15px; margin-right:16px;">Home</a>
+                <a href="blog.html" style="color:#2563eb; text-decoration:underline; font-size:15px; margin-right:16px;">Blog</a>
+                <p style="font-size: 12px; color: #999; margin-top: 20px; text-align: center;">
+                    © 2025 Language Baba | <a href="https://languagebaba.live" target="_blank" style="color: #25D366;">languagebaba.live</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="blog-script.js"></script>
+</body>
+</html>

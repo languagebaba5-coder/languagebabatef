@@ -5,7 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Language Baba - TEF Canada Small Batch Excellence | Only 5-8 Students Per Class</title>
     <meta name="description" content="Master TEF Canada with Language Baba's exclusive small batch classes. Only 5-8 students per batch for personalized attention. 95% success rate, expert instructors.">
-        <link rel="icon" type="image/png" href="/roundlogo.png" style="border-radius:50%;">
+    
+    <!-- LinkedIn Insights Tag -->
+    <script type="text/javascript">
+    _linkedin_partner_id = "8780257";
+    window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+    window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+    </script><script type="text/javascript">
+    (function(l) {
+    if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
+    window.lintrk.q=[]}
+    var s = document.getElementsByTagName("script")[0];
+    var b = document.createElement("script");
+    b.type = "text/javascript";b.async = true;
+    b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+    s.parentNode.insertBefore(b, s);})(window.lintrk);
+    </script>
+    <noscript>
+    <img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=8780257&fmt=gif" />
+    </noscript>
+    
+        <link rel="icon" type="image/png" href="/public/roundlogo.png" style="border-radius:50%;">
         <style>
             /* Force round favicon in browsers that support it */
             link[rel~="icon"] {
@@ -54,7 +74,7 @@
         <nav class="nav container">
             <div class="logo-section">
                 <div class="logo">
-                    <img src="/logotab.png" alt="Language Baba Logo" class="logo-img" style="height:64px; width:150px; border-radius:14px; vertical-align:middle; object-fit:cover;">
+                    <img src="/public/logotab.png" alt="Language Baba Logo" class="logo-img" style="height:64px; width:150px; border-radius:14px; vertical-align:middle; object-fit:cover;">
                     <span style="position:absolute;left:-9999px;">Language Baba</span>
                 </div>
                 <!--<a href="https://languagebaba.live" target="_blank" rel="noopener noreferrer" class="website-link">languagebaba.live</a> -->
@@ -62,6 +82,7 @@
             <div class="nav-links" id="navLinks">
                 <a href="#home">Home</a>
                 <a href="#courses">Courses</a>
+                <a href="blog.html">Blog</a>
                 <a href="#contact">Contact</a>
                 <a href="#" class="whatsapp-nav" onclick="openWhatsApp('general')">💬 WhatsApp</a>
             </div>
@@ -236,39 +257,11 @@
     <section class="testimonials fade-in-up">
         <div class="container">
             <h2 class="section-title">Small Batch Success Stories</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial">
-                    <div class="testimonial-header">
-                        <div class="testimonial-avatar">PS</div>
-                        <div class="testimonial-info">
-                            <h4>Priya Sharma</h4>
-                            <div class="testimonial-score">TEF 350+ | Mumbai</div>
-                            <div class="batch-mention">6 students in batch</div>
-                        </div>
-                    </div>
-                    <p>"The small batch size made all the difference! With only 6 students in my group, I got personal attention and my French improved rapidly. Got my Canada PR approved!"</p>
-                </div>
-                <div class="testimonial">
-                    <div class="testimonial-header">
-                        <div class="testimonial-avatar">RP</div>
-                        <div class="testimonial-info">
-                            <h4>Raj Patel</h4>
-                            <div class="testimonial-score">TEF 330+ | Delhi</div>
-                            <div class="batch-mention">7 students in batch</div>
-                        </div>
-                    </div>
-                    <p>"Language Baba's small batch approach is amazing. I was comfortable asking questions and practicing with just 7 other students. The teacher knew everyone's strengths and weaknesses."</p>
-                </div>
-                <div class="testimonial">
-                    <div class="testimonial-header">
-                        <div class="testimonial-avatar">MS</div>
-                        <div class="testimonial-info">
-                            <h4>Meera Singh</h4>
-                            <div class="testimonial-score">TEF 340+ | Bangalore</div>
-                            <div class="batch-mention">8 students in batch</div>
-                        </div>
-                    </div>
-                    <p>"The 8-student batch was perfect. Not too small to be boring, not too large to lose focus. Every student got individual feedback and support. Living in Canada now!"</p>
+            <div class="testimonials-grid" id="testimonials-container">
+                <!-- Testimonials will be loaded dynamically here -->
+                <div class="testimonial-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading testimonials...</p>
                 </div>
             </div>
         </div>
@@ -396,6 +389,7 @@
         </div>
     </footer>
     <script src="script.js"></script>
+    <script src="content-integration.js"></script>
 </body>
 <style>
 #mouse-anim-bg {

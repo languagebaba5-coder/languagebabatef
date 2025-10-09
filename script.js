@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScrolling();
     initWhatsAppTracking();
     initScrollAnimations();
+    loadTestimonials(); // Load testimonials dynamically
     
     // Add loading complete class
     document.body.classList.add('loaded');
@@ -316,6 +317,123 @@ function initScrollAnimations() {
     document.querySelectorAll('.benefit-card, .price-card, .testimonial, .module-card').forEach(el => {
         observer.observe(el);
     });
+}
+
+// Load Testimonials
+async function loadTestimonials() {
+    try {
+        const response = await fetch('/api/public/testimonials');
+        if (response.ok) {
+            const testimonials = await response.json();
+            renderTestimonials(testimonials);
+        } else {
+            console.error('Failed to load testimonials:', response.status);
+            showFallbackTestimonials();
+        }
+    } catch (error) {
+        console.error('Error loading testimonials:', error);
+        showFallbackTestimonials();
+    }
+}
+
+function renderTestimonials(testimonials) {
+    const container = document.getElementById('testimonials-container');
+    if (!container) return;
+    
+    if (testimonials.length === 0) {
+        showFallbackTestimonials();
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    testimonials.forEach(testimonial => {
+        const testimonialElement = createTestimonialElement(testimonial);
+        container.appendChild(testimonialElement);
+    });
+    
+    // Re-initialize scroll animations for new elements
+    initScrollAnimations();
+}
+
+function createTestimonialElement(testimonial) {
+    const div = document.createElement('div');
+    div.className = 'testimonial';
+    
+    // Get initials from name
+    const initials = getInitials(testimonial.name);
+    
+    // Create LinkedIn connect link if URL is provided
+    const linkedinLink = testimonial.linkedin ? 
+        `<a href="${testimonial.linkedin}" target="_blank" rel="noopener noreferrer" class="linkedin-connect">
+            <i class="fab fa-linkedin"></i> Connect
+        </a>` : '';
+    
+    div.innerHTML = `
+        <div class="testimonial-header">
+            <div class="testimonial-avatar">${initials}</div>
+            <div class="testimonial-info">
+                <h4>${testimonial.name}</h4>
+                <div class="testimonial-score">${testimonial.score}</div>
+                <div class="batch-mention">${testimonial.batch}</div>
+            </div>
+        </div>
+        <p>"${testimonial.content}"</p>
+        ${linkedinLink ? `<div class="testimonial-actions">${linkedinLink}</div>` : ''}
+    `;
+    
+    return div;
+}
+
+function getInitials(name) {
+    return name.split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .join('')
+        .substring(0, 2);
+}
+
+function showFallbackTestimonials() {
+    const container = document.getElementById('testimonials-container');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="testimonial">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar">PS</div>
+                <div class="testimonial-info">
+                    <h4>Priya Sharma</h4>
+                    <div class="testimonial-score">TEF 350+ | Mumbai</div>
+                    <div class="batch-mention">6 students in batch</div>
+                </div>
+            </div>
+            <p>"The small batch size made all the difference! With only 6 students in my group, I got personal attention and my French improved rapidly. Got my Canada PR approved!"</p>
+        </div>
+        <div class="testimonial">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar">RP</div>
+                <div class="testimonial-info">
+                    <h4>Raj Patel</h4>
+                    <div class="testimonial-score">TEF 330+ | Delhi</div>
+                    <div class="batch-mention">7 students in batch</div>
+                </div>
+            </div>
+            <p>"Language Baba's small batch approach is amazing. I was comfortable asking questions and practicing with just 7 other students. The teacher knew everyone's strengths and weaknesses."</p>
+        </div>
+        <div class="testimonial">
+            <div class="testimonial-header">
+                <div class="testimonial-avatar">MS</div>
+                <div class="testimonial-info">
+                    <h4>Meera Singh</h4>
+                    <div class="testimonial-score">TEF 340+ | Bangalore</div>
+                    <div class="batch-mention">8 students in batch</div>
+                </div>
+            </div>
+            <p>"The 8-student batch was perfect. Not too small to be boring, not too large to lose focus. Every student got individual feedback and support. Living in Canada now!"</p>
+        </div>
+    `;
+    
+    // Re-initialize scroll animations
+    initScrollAnimations();
 }
 
 // Export functions for global access

@@ -1,21 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
   <url>
     <loc>https://languagebaba.live/</loc>
-    <lastmod>2025-10-03</lastmod>
+    <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  
+  <!-- Blog Section -->
+  <url>
+    <loc>https://languagebaba.live/blog.html</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://languagebaba.live/privacy.html</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Main Page Sections -->
+  <url>
+    <loc>https://languagebaba.live/#about</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
   <url>
     <loc>https://languagebaba.live/#courses</loc>
-    <lastmod>2025-10-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
+  
+  <url>
+    <loc>https://languagebaba.live/#pricing</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://languagebaba.live/#testimonials</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://languagebaba.live/#faq</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
   <url>
     <loc>https://languagebaba.live/#contact</loc>
-    <lastmod>2025-10-03</lastmod>
+    <lastmod>2024-12-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  
+  <!-- Admin Panel (Excluded from public sitemap) -->
+  <!-- Note: Admin panel should not be indexed by search engines -->
 </urlset>
