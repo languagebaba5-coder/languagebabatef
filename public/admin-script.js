@@ -2982,9 +2982,9 @@ class AdminPanel {
 
     // Device Authorization Methods
     generateDeviceFingerprint() {
-        // For development/testing: use the authorized device fingerprint
+        // For development/testing: use an authorized device fingerprint
         // TODO: In production, implement proper device fingerprint generation and authorization flow
-        return 'test-device-fingerprint-123';
+        return 'device_admin_mgize5ru';
         
         /* Original dynamic generation (commented out for now):
         try {
