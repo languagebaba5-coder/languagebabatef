@@ -43,8 +43,8 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
-app.use(express.static('.'));
+// Serve static files from public directory
+app.use(express.static('public'));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -100,8 +100,8 @@ const checkDeviceAuthorization = async (req, res, next) => {
             return next();
         }
 
-        // Skip device check for device management routes (superusers need to manage devices)
-        if (req.path.startsWith('/api/admin/devices') && req.user) {
+        // Skip device check for admin management routes (superusers need to manage users and devices)
+        if ((req.path.startsWith('/api/admin/devices') || req.path.startsWith('/api/admin/users')) && req.user) {
             const currentUser = await db.getUserById(req.user.id);
             if (currentUser && currentUser.role === 'superuser') {
                 return next();
@@ -306,7 +306,7 @@ app.put('/api/users/:id/permissions', authenticateToken, checkPermission('users'
 });
 
 // Admin Management Routes
-app.get('/api/admin/users', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'read'), async (req, res) => {
+app.get('/api/admin/users', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'read'), async (req, res) => {
     try {
         const users = await db.getAllUsers();
         res.json(users);
@@ -315,7 +315,7 @@ app.get('/api/admin/users', checkDeviceAuthorization, authenticateToken, checkPe
     }
 });
 
-app.post('/api/admin/users', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'create'), async (req, res) => {
+app.post('/api/admin/users', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'create'), async (req, res) => {
     try {
         const { username, email, fullName, role, password } = req.body;
         
@@ -345,7 +345,7 @@ app.post('/api/admin/users', checkDeviceAuthorization, authenticateToken, checkP
     }
 });
 
-app.get('/api/admin/users/:id', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'read'), async (req, res) => {
+app.get('/api/admin/users/:id', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'read'), async (req, res) => {
     try {
         const user = await db.getUserById(req.params.id);
         if (!user) {
@@ -357,7 +357,7 @@ app.get('/api/admin/users/:id', checkDeviceAuthorization, authenticateToken, che
     }
 });
 
-app.put('/api/admin/users/:id', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'write'), async (req, res) => {
+app.put('/api/admin/users/:id', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'write'), async (req, res) => {
     try {
         const { username, email, fullName, role, isActive, password } = req.body;
         
@@ -429,7 +429,7 @@ app.put('/api/admin/users/:id', checkDeviceAuthorization, authenticateToken, che
     }
 });
 
-app.delete('/api/admin/users/:id', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'delete'), async (req, res) => {
+app.delete('/api/admin/users/:id', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'delete'), async (req, res) => {
     try {
         const user = await db.getUserById(req.params.id);
         if (!user) {
@@ -460,7 +460,7 @@ app.delete('/api/admin/users/:id', checkDeviceAuthorization, authenticateToken, 
     }
 });
 
-app.patch('/api/admin/users/:id/toggle', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'write'), async (req, res) => {
+app.patch('/api/admin/users/:id/toggle', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'write'), async (req, res) => {
     try {
         const { isActive } = req.body;
         const user = await db.getUserById(req.params.id);
@@ -494,7 +494,7 @@ app.patch('/api/admin/users/:id/toggle', checkDeviceAuthorization, authenticateT
 });
 
 // Device Management Routes (Superuser only)
-app.get('/api/admin/devices', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'read'), async (req, res) => {
+app.get('/api/admin/devices', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'read'), async (req, res) => {
     try {
         // Only superusers can manage devices
         const currentUser = await db.getUserById(req.user.id);
@@ -509,7 +509,7 @@ app.get('/api/admin/devices', checkDeviceAuthorization, authenticateToken, check
     }
 });
 
-app.post('/api/admin/devices', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'create'), async (req, res) => {
+app.post('/api/admin/devices', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'create'), async (req, res) => {
     try {
         // Only superusers can authorize devices
         const currentUser = await db.getUserById(req.user.id);
@@ -532,7 +532,7 @@ app.post('/api/admin/devices', checkDeviceAuthorization, authenticateToken, chec
     }
 });
 
-app.delete('/api/admin/devices/:id', checkDeviceAuthorization, authenticateToken, checkPermission('users', 'delete'), async (req, res) => {
+app.delete('/api/admin/devices/:id', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'delete'), async (req, res) => {
     try {
         // Only superusers can revoke device authorization
         const currentUser = await db.getUserById(req.user.id);
@@ -940,9 +940,14 @@ app.get('/api/database-stats', async (req, res) => {
     }
 });
 
-// Serve HTML files
+// Serve HTML files from public directory
 app.get('*.html', (req, res) => {
-    res.sendFile(path.join(__dirname, req.path));
+    res.sendFile(path.join(__dirname, 'public', req.path));
+});
+
+// Root route - serve index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Catch-all route for non-API requests
@@ -950,7 +955,7 @@ app.get('*', (req, res) => {
     if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'API endpoint not found' });
     }
-    res.sendFile(path.join(__dirname, req.path));
+    res.sendFile(path.join(__dirname, 'public', req.path));
 });
 
 // Error handling middleware
