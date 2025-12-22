@@ -9,7 +9,7 @@ const DatabasePrisma = require('./database-prisma');
 require('dotenv').config();
 
 // Add BigInt serializer for JSON responses
-BigInt.prototype.toJSON = function() {
+BigInt.prototype.toJSON = function () {
     return Number(this);
 };
 
@@ -80,11 +80,11 @@ const checkPermission = (permission, action) => {
         try {
             const permissions = await db.getUserPermissions(req.user.id);
             const userPermission = permissions.find(p => p.permissionType === permission);
-            
+
             if (!userPermission || !userPermission[`can${action.charAt(0).toUpperCase() + action.slice(1)}`]) {
                 return res.status(403).json({ error: `Insufficient permissions for ${action} on ${permission}` });
             }
-            
+
             next();
         } catch (error) {
             res.status(500).json({ error: 'Permission check failed' });
@@ -111,37 +111,37 @@ const checkDeviceAuthorization = async (req, res, next) => {
         // Get device fingerprint from headers
         const deviceFingerprint = req.headers['x-device-fingerprint'];
         const userAgent = req.headers['user-agent'];
-        const ipAddress = req.ip || 
-                         req.headers['x-forwarded-for']?.split(',')[0] || 
-                         req.headers['x-real-ip'] || 
-                         req.connection.remoteAddress || 
-                         req.socket.remoteAddress ||
-                         'unknown';
-        
+        const ipAddress = req.ip ||
+            req.headers['x-forwarded-for']?.split(',')[0] ||
+            req.headers['x-real-ip'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            'unknown';
+
         if (!deviceFingerprint) {
-            return res.status(403).json({ 
-                error: 'Device not authorized', 
-                message: 'Device fingerprint required. Please contact administrator to authorize this device.' 
+            return res.status(403).json({
+                error: 'Device not authorized',
+                message: 'Device fingerprint required. Please contact administrator to authorize this device.'
             });
         }
 
         // Check if device is authorized
         const isAuthorized = await db.isDeviceAuthorized(deviceFingerprint, ipAddress);
-        
+
         if (!isAuthorized) {
             // Log unauthorized access attempt
-            await db.logActivity(null, 'security', 'Unauthorized device access attempt', 
+            await db.logActivity(null, 'security', 'Unauthorized device access attempt',
                 `Unauthorized device: ${deviceFingerprint} from IP: ${ipAddress}`, 'warning');
-            
-            return res.status(403).json({ 
-                error: 'Device not authorized', 
-                message: 'This device is not authorized to access the admin panel. Please contact administrator.' 
+
+            return res.status(403).json({
+                error: 'Device not authorized',
+                message: 'This device is not authorized to access the admin panel. Please contact administrator.'
             });
         }
 
         // Update last access time for authorized device
         await db.updateDeviceLastAccess(deviceFingerprint);
-        
+
         next();
     } catch (error) {
         console.error('Device authorization error:', error);
@@ -155,7 +155,7 @@ const checkDeviceAuthorization = async (req, res, next) => {
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-        
+
         if (!username || !password) {
             return res.status(400).json({ error: 'Username and password required' });
         }
@@ -170,10 +170,10 @@ app.post('/api/auth/login', async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign(
-            { 
-                id: user.id, 
-                username: user.username, 
-                role: user.role 
+            {
+                id: user.id,
+                username: user.username,
+                role: user.role
             },
             JWT_SECRET,
             { expiresIn: '24h' }
@@ -207,7 +207,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
         }
 
         const permissions = await db.getUserPermissions(user.id);
-        
+
         res.json({
             user: {
                 id: user.id,
@@ -318,7 +318,7 @@ app.get('/api/admin/users', authenticateToken, checkDeviceAuthorization, checkPe
 app.post('/api/admin/users', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'create'), async (req, res) => {
     try {
         const { username, email, fullName, role, password } = req.body;
-        
+
         // Validate required fields
         if (!username || !email || !fullName || !role || !password) {
             return res.status(400).json({ error: 'All fields are required' });
@@ -337,7 +337,7 @@ app.post('/api/admin/users', authenticateToken, checkDeviceAuthorization, checkP
             role,
             password
         });
-        
+
         await db.logActivity(req.user.id, 'users', 'Admin user created', `Created admin user: ${username}`, 'info');
         res.status(201).json(user);
     } catch (error) {
@@ -360,7 +360,7 @@ app.get('/api/admin/users/:id', authenticateToken, checkDeviceAuthorization, che
 app.put('/api/admin/users/:id', authenticateToken, checkDeviceAuthorization, checkPermission('users', 'write'), async (req, res) => {
     try {
         const { username, email, fullName, role, isActive, password } = req.body;
-        
+
         // Get the target user being updated
         const targetUser = await db.getUserById(req.params.id);
         if (!targetUser) {
@@ -385,10 +385,10 @@ app.put('/api/admin/users/:id', authenticateToken, checkDeviceAuthorization, che
         if (req.params.id === req.user.id && role && currentUser.role !== 'superuser') {
             const currentRoleLevel = roleHierarchy[currentUser.role] || 0;
             const targetRoleLevel = roleHierarchy[role] || 0;
-            
+
             if (targetRoleLevel > currentRoleLevel) {
-                return res.status(403).json({ 
-                    error: `Cannot elevate your own role from ${currentUser.role} to ${role}. Only superusers can promote users to higher roles.` 
+                return res.status(403).json({
+                    error: `Cannot elevate your own role from ${currentUser.role} to ${role}. Only superusers can promote users to higher roles.`
                 });
             }
         }
@@ -407,7 +407,7 @@ app.put('/api/admin/users/:id', authenticateToken, checkDeviceAuthorization, che
         if (targetUser.role === 'superuser' && isActive === false) {
             return res.status(400).json({ error: 'Cannot deactivate superuser' });
         }
-        
+
         const updateData = {
             username,
             email,
@@ -464,7 +464,7 @@ app.patch('/api/admin/users/:id/toggle', authenticateToken, checkDeviceAuthoriza
     try {
         const { isActive } = req.body;
         const user = await db.getUserById(req.params.id);
-        
+
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -518,14 +518,14 @@ app.post('/api/admin/devices', authenticateToken, checkDeviceAuthorization, chec
         }
 
         const { deviceFingerprint, deviceName, ipAddress, description } = req.body;
-        
+
         if (!deviceFingerprint) {
             return res.status(400).json({ error: 'Device fingerprint is required' });
         }
 
         const device = await db.authorizeDevice(deviceFingerprint, deviceName, ipAddress, description, req.user.id);
         await db.logActivity(req.user.id, 'security', 'Device authorized', `Authorized device: ${deviceName || deviceFingerprint}`, 'info');
-        
+
         res.status(201).json(device);
     } catch (error) {
         res.status(500).json({ error: 'Failed to authorize device' });
@@ -547,7 +547,7 @@ app.delete('/api/admin/devices/:id', authenticateToken, checkDeviceAuthorization
 
         await db.revokeDeviceAuthorization(req.params.id);
         await db.logActivity(req.user.id, 'security', 'Device authorization revoked', `Revoked authorization for device: ${device.deviceName || device.deviceFingerprint}`, 'warning');
-        
+
         res.json({ message: 'Device authorization revoked successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to revoke device authorization' });
@@ -719,21 +719,57 @@ app.get('/api/pricing-plans', authenticateToken, checkPermission('pricing', 'rea
 
 app.post('/api/pricing-plans', authenticateToken, checkPermission('pricing', 'create'), async (req, res) => {
     try {
-        const plan = await db.createPricingPlan(req.body, req.user.id);
+        // Validate and sanitize input data
+        const { title, price, badge, features, buttonText, buttonType, buttonUrl, isPopular, orderIndex } = req.body;
+
+        const planData = {
+            title,
+            price,
+            features,
+            buttonText
+        };
+
+        // Add optional fields only if they exist
+        if (badge !== undefined && badge !== null) planData.badge = badge;
+        if (buttonType !== undefined && buttonType !== null) planData.buttonType = buttonType;
+        if (buttonUrl !== undefined && buttonUrl !== null) planData.buttonUrl = buttonUrl;
+        if (isPopular !== undefined) planData.isPopular = Boolean(isPopular);
+        if (orderIndex !== undefined && orderIndex !== null) planData.orderIndex = BigInt(orderIndex);
+
+        const plan = await db.createPricingPlan(planData, req.user.id);
         await db.logActivity(req.user.id, 'pricing', 'Pricing plan created', `"${plan.title}" plan created`, 'success');
         res.json(plan);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to create pricing plan' });
+        console.error('Error creating pricing plan:', error);
+        res.status(500).json({ error: 'Failed to create pricing plan', details: error.message });
     }
 });
 
 app.put('/api/pricing-plans/:id', authenticateToken, checkPermission('pricing', 'write'), async (req, res) => {
     try {
-        const plan = await db.updatePricingPlan(req.params.id, req.body, req.user.id);
+        // Validate and sanitize input data
+        const { title, price, badge, features, buttonText, buttonType, buttonUrl, isPopular, orderIndex } = req.body;
+
+        const planData = {
+            title,
+            price,
+            features,
+            buttonText
+        };
+
+        // Add optional fields only if they exist
+        if (badge !== undefined && badge !== null) planData.badge = badge;
+        if (buttonType !== undefined && buttonType !== null) planData.buttonType = buttonType;
+        if (buttonUrl !== undefined && buttonUrl !== null) planData.buttonUrl = buttonUrl;
+        if (isPopular !== undefined) planData.isPopular = Boolean(isPopular);
+        if (orderIndex !== undefined && orderIndex !== null) planData.orderIndex = BigInt(orderIndex);
+
+        const plan = await db.updatePricingPlan(req.params.id, planData, req.user.id);
         await db.logActivity(req.user.id, 'pricing', 'Pricing plan updated', `"${plan.title}" plan updated`, 'info');
         res.json(plan);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update pricing plan' });
+        console.error('Error updating pricing plan:', error);
+        res.status(500).json({ error: 'Failed to update pricing plan', details: error.message });
     }
 });
 
@@ -753,7 +789,7 @@ app.get('/api/blog-posts', async (req, res) => {
         console.log('Blog posts API called');
         const { status = 'published', limit = 50, offset = 0 } = req.query;
         console.log('Query params:', { status, limit, offset });
-        
+
         // Only allow published posts for public access
         const posts = await db.getBlogPosts('published', parseInt(limit), parseInt(offset));
         console.log('Posts retrieved:', posts.length);
@@ -796,7 +832,7 @@ app.get('/api/admin/blog-posts', authenticateToken, checkPermission('blog', 'rea
         console.log('Admin blog posts API called');
         const { status, limit = 50, offset = 0 } = req.query;
         console.log('Query params:', { status, limit, offset });
-        
+
         const posts = await db.getBlogPosts(status, parseInt(limit), parseInt(offset));
         console.log('Posts retrieved:', posts.length);
         res.json(posts);
@@ -990,7 +1026,7 @@ async function startServer() {
         // Test Prisma connection
         await db.prisma.$connect();
         console.log('Prisma connected successfully');
-        
+
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
             console.log(`Database connected successfully`);
