@@ -78,10 +78,10 @@ class DatabasePrisma {
 
     async createUser(userData) {
         const { username, email, fullName, role, password } = userData;
-        
+
         // Hash password
         const passwordHash = await bcrypt.hash(password, 10);
-        
+
         return await this.prisma.user.create({
             data: {
                 username,
@@ -107,13 +107,13 @@ class DatabasePrisma {
 
     async updateUser(id, userData) {
         const updateData = { ...userData };
-        
+
         // Hash password if provided
         if (userData.password) {
             updateData.passwordHash = await bcrypt.hash(userData.password, 10);
             delete updateData.password;
         }
-        
+
         return await this.prisma.user.update({
             where: { id },
             data: updateData,
@@ -288,7 +288,7 @@ class DatabasePrisma {
         const testimonials = await this.prisma.testimonial.findMany({
             orderBy: { orderIndex: 'asc' }
         });
-        
+
         // Convert BigInt to Number for JSON serialization
         return testimonials.map(testimonial => ({
             ...testimonial,
@@ -301,9 +301,9 @@ class DatabasePrisma {
         const testimonial = await this.prisma.testimonial.findUnique({
             where: { id }
         });
-        
+
         if (!testimonial) return null;
-        
+
         // Convert BigInt to Number for JSON serialization
         return {
             ...testimonial,
@@ -373,29 +373,47 @@ class DatabasePrisma {
 
     // Pricing Plans Management
     async getPricingPlans() {
-        return await this.prisma.pricingPlan.findMany({
+        const plans = await this.prisma.pricingPlan.findMany({
             orderBy: { orderIndex: 'asc' }
         });
+
+        // Convert BigInt to Number for JSON serialization
+        return plans.map(plan => ({
+            ...plan,
+            orderIndex: plan.orderIndex ? Number(plan.orderIndex) : 0
+        }));
     }
 
     async createPricingPlan(planData, userId) {
-        return await this.prisma.pricingPlan.create({
+        const plan = await this.prisma.pricingPlan.create({
             data: {
                 ...planData,
                 createdById: userId,
                 updatedById: userId
             }
         });
+
+        // Convert BigInt to Number for JSON serialization
+        return {
+            ...plan,
+            orderIndex: plan.orderIndex ? Number(plan.orderIndex) : 0
+        };
     }
 
     async updatePricingPlan(id, planData, userId) {
-        return await this.prisma.pricingPlan.update({
+        const plan = await this.prisma.pricingPlan.update({
             where: { id },
             data: {
                 ...planData,
                 updatedById: userId
             }
         });
+
+        // Convert BigInt to Number for JSON serialization
+        return {
+            ...plan,
+            orderIndex: plan.orderIndex ? Number(plan.orderIndex) : 0
+        };
     }
 
     async deletePricingPlan(id) {
@@ -407,7 +425,7 @@ class DatabasePrisma {
     // Blog Posts Management
     async getBlogPosts(status = null, limit = 50, offset = 0) {
         const where = status ? { status } : {};
-        
+
         const posts = await this.prisma.blogPost.findMany({
             where,
             take: limit,
@@ -423,7 +441,7 @@ class DatabasePrisma {
                 }
             }
         });
-        
+
         // Convert BigInt to Number for JSON serialization
         return posts.map(post => ({
             ...post,
@@ -454,7 +472,7 @@ class DatabasePrisma {
                 updatedById: userId
             }
         });
-        
+
         // Convert BigInt to Number for JSON serialization
         return {
             ...post,
@@ -470,7 +488,7 @@ class DatabasePrisma {
                 updatedById: userId
             }
         });
-        
+
         // Convert BigInt to Number for JSON serialization
         return {
             ...post,
@@ -641,7 +659,7 @@ class DatabasePrisma {
                 ]
             }
         });
-        
+
         return !!device;
     }
 
