@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Baba - Admin Panel</title>
+    <link rel="icon" type="image/png" href="roundlogo.png">
+    <link rel="stylesheet" href="admin-style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="/public/logotab.png" alt="Language Baba" class="admin-logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="menu-item" data-section="content">
+                    <i class="fas fa-edit"></i>
+                    <span>Content Management</span>
+                </li>
+                <li class="menu-item" data-section="pricing">
+                    <i class="fas fa-tags"></i>
+                    <span>Pricing Section</span>
+                </li>
+                <li class="menu-item" data-section="blog">
+                    <i class="fas fa-blog"></i>
+                    <span>Blog Posts</span>
+                </li>
+                <li class="menu-item" data-section="seo">
+                    <i class="fas fa-search"></i>
+                    <span>SEO Management</span>
+                </li>
+                <li class="menu-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+                <li class="menu-item" data-section="admin-management">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Admin Management</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="index.html" class="view-site-btn">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>View Site</span>
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" style="display: none; text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; margin: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 10px; color: #666; font-weight: 500;">Loading...</p>
+            </div>
+            
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="admin-user">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Users</h3>
+                            <p class="card-number" id="user-count">0</p>
+                            <span class="card-change">Active</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Benefits</h3>
+                            <p class="card-number" id="content-count">0</p>
+                            <span class="card-change">Active</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-blog"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Blog Posts</h3>
+                            <p class="card-number" id="blog-count">0</p>
+                            <span class="card-change">Published</span>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Pricing Plans</h3>
+                            <p class="card-number" id="pricing-count">0</p>
+                            <span class="card-change">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="recent-activity">
+                        <div class="activity-header">
+                            <h3>Recent Activity</h3>
+                            <button class="refresh-activities-btn" onclick="refreshActivities()" title="Refresh Activities">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div class="activity-container">
+                            <div class="activity-list" id="activity-list">
+                                <!-- Activities will be loaded here dynamically -->
+                            </div>
+                            <div class="activity-loading" id="activity-loading" style="display: none;">
+                                <div class="loading-spinner"></div>
+                                <span>Loading more activities...</span>
+                            </div>
+                            <div class="activity-load-more" id="activity-load-more" style="display: none;">
+                                <button class="load-more-btn" onclick="loadMoreActivities()">
+                                    <i class="fas fa-plus"></i>
+                                    Load More Activities
+                                </button>
+                            </div>
+                            <div class="activity-end" id="activity-end" style="display: none;">
+                                <span>No more activities to show</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Content Management Section -->
+            <section id="content" class="content-section">
+                <div class="section-header">
+                    <h2>Content Management</h2>
+                    <p>Manage your website content and sections</p>
+                </div>
+
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-tab="hero">Hero Section</button>
+                    <button class="tab-btn" data-tab="benefits">Benefits</button>
+                    <button class="tab-btn" data-tab="testimonials">Testimonials</button>
+                    <button class="tab-btn" data-tab="faq">FAQ</button>
+                </div>
+
+                <!-- Hero Section Tab -->
+                <div id="hero" class="tab-content active">
+                    <form class="content-form">
+                        <div class="form-group">
+                            <label for="hero-title">Main Title</label>
+                            <input type="text" id="hero-title" value="Master French for Canada PR with TEF Canada Success">
+                        </div>
+                        <div class="form-group">
+                            <label for="hero-subtitle">Subtitle</label>
+                            <input type="text" id="hero-subtitle" value="Only 5-8 Students Per Class!">
+                        </div>
+                        <div class="form-group">
+                            <label for="hero-description">Description</label>
+                            <textarea id="hero-description" rows="3">Get personalized attention and achieve your Canadian dreams with our exclusive small batch TEF Canada preparation program</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="success-rate">Success Rate</label>
+                            <input type="text" id="success-rate" value="95%">
+                        </div>
+                        <div class="form-group">
+                            <label for="students-count">Students Count</label>
+                            <input type="text" id="students-count" value="1000+">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <!-- Benefits Tab -->
+                <div id="benefits" class="tab-content">
+                    <div class="benefits-manager">
+                        <div class="benefits-list" id="benefits-list">
+                            <!-- Benefits will be loaded here -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="addBenefit()">
+                            <i class="fas fa-plus"></i> Add Benefit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Testimonials Tab -->
+                <div id="testimonials" class="tab-content">
+                    <div class="testimonials-manager">
+                        <div class="testimonials-list" id="testimonials-list">
+                            <!-- Testimonials will be loaded here -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="addTestimonial()">
+                            <i class="fas fa-plus"></i> Add Testimonial
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FAQ Tab -->
+                <div id="faq" class="tab-content">
+                    <div class="faq-manager">
+                        <div class="faq-list" id="faq-list">
+                            <!-- FAQ items will be loaded here -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="addFAQ()">
+                            <i class="fas fa-plus"></i> Add FAQ
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pricing Section -->
+            <section id="pricing" class="content-section">
+                <div class="section-header">
+                    <h2>Pricing Section Management</h2>
+                    <p>Manage your pricing plans and programs</p>
+                </div>
+
+                <div class="pricing-manager">
+                    <div class="pricing-list" id="pricing-list">
+                        <!-- Pricing cards will be loaded here -->
+                    </div>
+                    <button class="btn btn-secondary" onclick="addPricingPlan()">
+                        <i class="fas fa-plus"></i> Add Pricing Plan
+                    </button>
+                </div>
+            </section>
+
+            <!-- Blog Management Section -->
+            <section id="blog" class="content-section">
+                <div class="section-header">
+                    <h2>Blog Management</h2>
+                    <p>Create and manage your blog posts</p>
+                </div>
+
+                <div class="blog-actions">
+                    <button class="btn btn-primary" onclick="showBlogEditor()">
+                        <i class="fas fa-plus"></i> Create New Post
+                    </button>
+                    <div class="blog-filters">
+                        <select id="blog-filter">
+                            <option value="all">All Posts</option>
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="blog-list" id="blog-list">
+                    <!-- Blog posts will be loaded here -->
+                </div>
+
+                <!-- Blog Editor Modal -->
+                <div id="blog-editor-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Create/Edit Blog Post</h3>
+                            <button class="modal-close" onclick="closeBlogEditor()">&times;</button>
+                        </div>
+                        <form id="blog-editor-form" class="blog-editor">
+                            <div class="form-group">
+                                <label for="blog-title">Post Title</label>
+                                <input type="text" id="blog-title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="blog-slug">URL Slug</label>
+                                <input type="text" id="blog-slug" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="blog-excerpt">Excerpt</label>
+                                <textarea id="blog-excerpt" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="blog-content">Content</label>
+                                <textarea id="blog-content" rows="10"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="blog-category">Category</label>
+                                    <select id="blog-category">
+                                        <option value="tef-canada">TEF Canada</option>
+                                        <option value="french-learning">French Learning</option>
+                                        <option value="canada-immigration">Canada Immigration</option>
+                                        <option value="tips">Tips & Tricks</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="blog-status">Status</label>
+                                    <select id="blog-status">
+                                        <option value="draft">Draft</option>
+                                        <option value="published">Published</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="blog-featured-image">Featured Image URL</label>
+                                <input type="url" id="blog-featured-image">
+                            </div>
+                            
+                            <!-- SEO Section -->
+                            <div class="seo-section">
+                                <h4>SEO Settings</h4>
+                                <div class="form-group">
+                                    <label for="blog-seo-title">SEO Title</label>
+                                    <input type="text" id="blog-seo-title" maxlength="60" placeholder="Leave empty to use post title">
+                                    <div class="char-count">0/60 characters</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="blog-seo-description">Meta Description</label>
+                                    <textarea id="blog-seo-description" rows="3" maxlength="160" placeholder="Leave empty to use excerpt"></textarea>
+                                    <div class="char-count">0/160 characters</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="blog-seo-keywords">Keywords (comma separated)</label>
+                                    <input type="text" id="blog-seo-keywords" placeholder="e.g., TEF Canada, French learning, Canada PR">
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeBlogEditor()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Post</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEO Management Section -->
+            <section id="seo" class="content-section">
+                <div class="section-header">
+                    <h2>SEO Management</h2>
+                    <p>Optimize your website for search engines</p>
+                </div>
+
+                <div class="seo-tabs">
+                    <button class="tab-btn active" data-tab="home-seo">Homepage SEO</button>
+                    <button class="tab-btn" data-tab="meta-tags">Meta Tags</button>
+                </div>
+
+                <!-- Homepage SEO -->
+                <div id="home-seo" class="tab-content active">
+                    <form class="seo-form">
+                        <div class="form-group">
+                            <label for="home-title">Page Title</label>
+                            <input type="text" id="home-title" value="Language Baba - TEF Canada Small Batch Excellence | Only 5-8 Students Per Class">
+                            <div class="char-count">0/60 characters</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="home-description">Meta Description</label>
+                            <textarea id="home-description" rows="3">Master TEF Canada with Language Baba's exclusive small batch classes. Only 5-8 students per batch for personalized attention. 95% success rate, expert instructors.</textarea>
+                            <div class="char-count">0/160 characters</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="home-keywords">Keywords (comma separated)</label>
+                            <input type="text" id="home-keywords" value="TEF Canada, French learning, small batch, Canada PR, French classes">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save SEO Settings</button>
+                    </form>
+                </div>
+
+
+                <!-- Meta Tags -->
+                <div id="meta-tags" class="tab-content">
+                    <form class="meta-tags-form">
+                        <div class="form-group">
+                            <label for="og-title">Open Graph Title</label>
+                            <input type="text" id="og-title">
+                        </div>
+                        <div class="form-group">
+                            <label for="og-description">Open Graph Description</label>
+                            <textarea id="og-description" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="og-image">Open Graph Image URL</label>
+                            <input type="url" id="og-image">
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter-card">Twitter Card Type</label>
+                            <select id="twitter-card">
+                                <option value="summary">Summary</option>
+                                <option value="summary_large_image">Summary Large Image</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Meta Tags</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <h2>Settings</h2>
+                    <p>Configure your website settings</p>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>General Settings</h3>
+                        <form class="settings-form">
+                            <div class="form-group">
+                                <label for="site-name">Site Name</label>
+                                <input type="text" id="site-name" value="Language Baba">
+                            </div>
+                            <div class="form-group">
+                                <label for="whatsapp-number">WhatsApp Number</label>
+                                <input type="text" id="whatsapp-number" value="917303619158">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email">Contact Email</label>
+                                <input type="email" id="contact-email" value="languagebaba5@gmail.com">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Settings</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>Data Management</h3>
+                        <div class="data-actions">
+                            <button class="btn btn-secondary" onclick="exportData()">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn btn-secondary" onclick="importData()">
+                                <i class="fas fa-upload"></i> Import Data
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Management Section -->
+            <section id="admin-management" class="content-section">
+                <div class="section-header">
+                    <h2>Admin Management</h2>
+                    <p>Manage admin users, permissions, and device authorization</p>
+                </div>
+
+                <!-- Admin Management Tabs -->
+                <div class="admin-tabs">
+                    <button class="tab-btn active" onclick="showAdminTab('users')">
+                        <i class="fas fa-users"></i> User Management
+                    </button>
+                    <button class="tab-btn" onclick="showAdminTab('devices')">
+                        <i class="fas fa-mobile-alt"></i> Device Management
+                    </button>
+                </div>
+
+                <!-- User Management Tab -->
+                <div id="admin-users-tab" class="admin-tab-content active">
+                    <div class="admin-management-content">
+                    <!-- Add New Admin Form -->
+                    <div class="admin-form-card">
+                        <h3>Add New Admin</h3>
+                        <form id="add-admin-form" class="admin-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="admin-username">Username</label>
+                                    <input type="text" id="admin-username" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="admin-email">Email</label>
+                                    <input type="email" id="admin-email" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="admin-fullname">Full Name</label>
+                                    <input type="text" id="admin-fullname" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="admin-role">Role</label>
+                                    <select id="admin-role" required>
+                                        <option value="admin">Admin</option>
+                                        <option value="editor">Editor</option>
+                                        <option value="viewer">Viewer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="admin-password">Password</label>
+                                <div class="password-input-container">
+                                    <input type="password" id="admin-password" required minlength="6">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('admin-password', 'admin-password-toggle')">
+                                        <i class="fas fa-eye" id="admin-password-toggle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> Create Admin
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Admin Users List -->
+                    <div class="admin-list-card">
+                        <div class="card-header">
+                            <h3>Admin Users</h3>
+                            <div class="admin-actions">
+                                <button class="btn btn-secondary" onclick="refreshAdminList()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="admin-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Full Name</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Last Login</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-list-tbody">
+                                    <!-- Admin users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Edit Admin Modal -->
+                    <div id="edit-admin-modal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Edit Admin User</h3>
+                                <span class="close" onclick="closeEditModal()">&times;</span>
+                            </div>
+                            <form id="edit-admin-form" class="admin-form">
+                                <input type="hidden" id="edit-admin-id">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="edit-admin-username">Username</label>
+                                        <input type="text" id="edit-admin-username" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-admin-email">Email</label>
+                                        <input type="email" id="edit-admin-email" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="edit-admin-fullname">Full Name</label>
+                                        <input type="text" id="edit-admin-fullname" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="edit-admin-role">Role</label>
+                                        <select id="edit-admin-role">
+                                            <option value="superuser">Superuser</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="editor">Editor</option>
+                                            <option value="viewer">Viewer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-admin-status">Status</label>
+                                    <select id="edit-admin-status">
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-admin-password">New Password (leave blank to keep current)</label>
+                                    <div class="password-input-container">
+                                        <input type="password" id="edit-admin-password" minlength="6">
+                                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('edit-admin-password', 'edit-admin-password-toggle')">
+                                            <i class="fas fa-eye" id="edit-admin-password-toggle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Management Tab -->
+            <div id="admin-devices-tab" class="admin-tab-content">
+                <div class="device-management-content">
+                    <!-- Add New Device Form -->
+                    <div class="device-form-card">
+                        <h3>Authorize New Device</h3>
+                        <form id="add-device-form" class="device-form">
+                            <div class="form-group">
+                                <label for="device-fingerprint">Device Fingerprint</label>
+                                <input type="text" id="device-fingerprint" required placeholder="Enter device fingerprint">
+                            </div>
+                            <div class="form-group">
+                                <label for="device-name">Device Name</label>
+                                <input type="text" id="device-name" placeholder="e.g., John's Laptop">
+                            </div>
+                            <div class="form-group">
+                                <label for="device-ip">IP Address (Optional)</label>
+                                <input type="text" id="device-ip" placeholder="192.168.1.100">
+                            </div>
+                            <div class="form-group">
+                                <label for="device-description">Description</label>
+                                <textarea id="device-description" placeholder="Additional notes about this device"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Authorize Device
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Device List -->
+                    <div class="device-list-card">
+                        <div class="card-header">
+                            <h3>Authorized Devices</h3>
+                            <button class="btn btn-secondary" onclick="refreshDeviceList()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device Name</th>
+                                        <th>Fingerprint</th>
+                                        <th>IP Address</th>
+                                        <th>Last Access</th>
+                                        <th>Authorized By</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="device-list-tbody">
+                                    <!-- Devices will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </main>
+    </div>
+
+    <!-- Edit Benefit Modal -->
+    <div id="edit-benefit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Benefit</h3>
+                <button class="modal-close" onclick="closeEditBenefitModal()">&times;</button>
+            </div>
+            <form id="edit-benefit-form" class="modal-form">
+                <div class="form-group">
+                    <label for="edit-benefit-icon">Icon (Emoji)</label>
+                    <input type="text" id="edit-benefit-icon" placeholder="e.g., 🎯" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-benefit-title">Title</label>
+                    <input type="text" id="edit-benefit-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-benefit-description">Description</label>
+                    <textarea id="edit-benefit-description" rows="3" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditBenefitModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Testimonial Modal -->
+    <div id="edit-testimonial-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Testimonial</h3>
+                <button class="modal-close" onclick="closeEditTestimonialModal()">&times;</button>
+            </div>
+            <form id="edit-testimonial-form" class="modal-form">
+                <div class="form-group">
+                    <label for="edit-testimonial-name">Customer Name</label>
+                    <input type="text" id="edit-testimonial-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-testimonial-initials">Initials</label>
+                    <input type="text" id="edit-testimonial-initials" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-testimonial-score">TEF Score and Location</label>
+                    <input type="text" id="edit-testimonial-score" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-testimonial-batch">Batch Size</label>
+                    <input type="text" id="edit-testimonial-batch" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-testimonial-content">Testimonial Content</label>
+                    <textarea id="edit-testimonial-content" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-testimonial-linkedin">LinkedIn Profile URL (Optional)</label>
+                    <input type="url" id="edit-testimonial-linkedin" placeholder="https://linkedin.com/in/username">
+                    <small class="form-help">Add LinkedIn profile URL to show "Connect" link</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditTestimonialModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit FAQ Modal -->
+    <div id="edit-faq-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit FAQ</h3>
+                <button class="modal-close" onclick="closeEditFAQModal()">&times;</button>
+            </div>
+            <form id="edit-faq-form" class="modal-form">
+                <div class="form-group">
+                    <label for="edit-faq-question">Question</label>
+                    <input type="text" id="edit-faq-question" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-faq-answer">Answer</label>
+                    <textarea id="edit-faq-answer" rows="4" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditFAQModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Testimonial Modal -->
+    <div id="add-testimonial-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Testimonial</h3>
+                <button class="modal-close" onclick="closeAddTestimonialModal()">&times;</button>
+            </div>
+            <form id="add-testimonial-form" class="modal-form">
+                <div class="form-group">
+                    <label for="add-testimonial-name">Customer Name</label>
+                    <input type="text" id="add-testimonial-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-testimonial-initials">Initials</label>
+                    <input type="text" id="add-testimonial-initials" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-testimonial-score">TEF Score and Location</label>
+                    <input type="text" id="add-testimonial-score" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-testimonial-batch">Batch Size</label>
+                    <input type="text" id="add-testimonial-batch" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-testimonial-content">Testimonial Content</label>
+                    <textarea id="add-testimonial-content" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="add-testimonial-linkedin">LinkedIn Profile URL (Optional)</label>
+                    <input type="url" id="add-testimonial-linkedin" placeholder="https://linkedin.com/in/username">
+                    <small class="form-help">Add LinkedIn profile URL to show "Connect" link</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddTestimonialModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Testimonial</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Pricing Plan Modal -->
+    <div id="add-pricing-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Pricing Plan</h3>
+                <button class="modal-close" onclick="closeAddPricingModal()">&times;</button>
+            </div>
+            <form id="add-pricing-form" class="modal-form">
+                <div class="form-group">
+                    <label for="add-pricing-title">Plan Title</label>
+                    <input type="text" id="add-pricing-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-pricing-price">Price</label>
+                    <input type="text" id="add-pricing-price" placeholder="e.g., ₹800, Free" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-pricing-badge">Badge Text (Optional)</label>
+                    <input type="text" id="add-pricing-badge" placeholder="e.g., 5-8 Students Only, Most Popular">
+                </div>
+                <div class="form-group">
+                    <label for="add-pricing-features">Features (one per line)</label>
+                    <textarea id="add-pricing-features" rows="6" placeholder="Enter each feature on a new line" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="add-pricing-button-text">Button Text</label>
+                    <input type="text" id="add-pricing-button-text" placeholder="e.g., Book Now, Get Started" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-pricing-button-type">Button Type</label>
+                    <select id="add-pricing-button-type">
+                        <option value="general">General</option>
+                        <option value="primary">Primary</option>
+                        <option value="secondary">Secondary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="add-pricing-button-url">Button URL (Optional)</label>
+                    <input type="url" id="add-pricing-button-url" placeholder="https://example.com/book">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="add-pricing-popular">
+                        <span class="checkmark"></span>
+                        Mark as Popular Plan
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddPricingModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Pricing Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Pricing Plan Modal -->
+    <div id="edit-pricing-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Pricing Plan</h3>
+                <button class="modal-close" onclick="closeEditPricingModal()">&times;</button>
+            </div>
+            <form id="edit-pricing-form" class="modal-form">
+                <div class="form-group">
+                    <label for="edit-pricing-title">Plan Title</label>
+                    <input type="text" id="edit-pricing-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-pricing-price">Price</label>
+                    <input type="text" id="edit-pricing-price" placeholder="e.g., ₹800, Free" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-pricing-badge">Badge Text (Optional)</label>
+                    <input type="text" id="edit-pricing-badge" placeholder="e.g., 5-8 Students Only, Most Popular">
+                </div>
+                <div class="form-group">
+                    <label for="edit-pricing-features">Features (one per line)</label>
+                    <textarea id="edit-pricing-features" rows="6" placeholder="Enter each feature on a new line" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-pricing-button-text">Button Text</label>
+                    <input type="text" id="edit-pricing-button-text" placeholder="e.g., Book Now, Get Started" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-pricing-button-type">Button Type</label>
+                    <select id="edit-pricing-button-type">
+                        <option value="general">General</option>
+                        <option value="primary">Primary</option>
+                        <option value="secondary">Secondary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-pricing-button-url">Button URL (Optional)</label>
+                    <input type="url" id="edit-pricing-button-url" placeholder="https://example.com/book">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="edit-pricing-popular">
+                        <span class="checkmark"></span>
+                        Mark as Popular Plan
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditPricingModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>

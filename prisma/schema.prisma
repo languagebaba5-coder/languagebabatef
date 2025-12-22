@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username            String           @unique @db.String(50)
+  email               String           @unique @db.String(100)
+  passwordHash        String           @map("password_hash") @db.String(255)
+  fullName            String           @map("full_name") @db.String(100)
+  role                String           @default("admin") @db.String(20)
+  isActive            Boolean?         @default(true) @map("is_active")
+  lastLogin           DateTime?        @map("last_login") @db.Timestamp(6)
+  createdAt           DateTime?        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime?        @default(now()) @map("updated_at") @db.Timestamp(6)
+  activityLogs        ActivityLog[]
+  createdBenefits     Benefit[]        @relation("CreatedBenefit")
+  updatedBenefits     Benefit[]        @relation("UpdatedBenefit")
+  createdBlogs        BlogPost[]       @relation("CreatedBlog")
+  updatedBlogs        BlogPost[]       @relation("UpdatedBlog")
+  createdFaqs         Faq[]            @relation("CreatedFaq")
+  updatedFaqs         Faq[]            @relation("UpdatedFaq")
+  uploadedFiles       FileUpload[]
+  createdPricing      PricingPlan[]    @relation("CreatedPricing")
+  updatedPricing      PricingPlan[]    @relation("UpdatedPricing")
+  createdSeo          SeoSetting[]     @relation("CreatedSeo")
+  updatedSeo          SeoSetting[]     @relation("UpdatedSeo")
+  updatedSettings     Setting[]
+  createdTestimonials Testimonial[]    @relation("CreatedTestimonial")
+  updatedTestimonials Testimonial[]    @relation("UpdatedTestimonial")
+  permissions         UserPermission[]
+  createdContent      WebsiteContent[] @relation("CreatedContent")
+  updatedContent      WebsiteContent[] @relation("UpdatedContent")
+  authorizedDevices    AuthorizedDevice[] @relation("AuthorizedDevices")
+
+  @@map("users")
+}
+
+model UserPermission {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId         String?   @map("user_id") @db.Uuid
+  permissionType String    @map("permission_type") @db.String(50)
+  canRead        Boolean?  @default(false) @map("can_read")
+  canWrite       Boolean?  @default(false) @map("can_write")
+  canDelete      Boolean?  @default(false) @map("can_delete")
+  canCreate      Boolean?  @default(false) @map("can_create")
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("user_permissions")
+}
+
+model ActivityLog {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId       String?   @map("user_id") @db.Uuid
+  activityType String    @map("activity_type") @db.String(50)
+  action       String    @db.String(100)
+  description  String?
+  severity     String?   @default("info") @db.String(20)
+  ipAddress    String?   @map("ip_address") @db.Inet
+  userAgent    String?   @map("user_agent")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  user         User?     @relation(fields: [userId], references: [id], onUpdate: NoAction)
+
+  @@index([createdAt], map: "idx_activity_logs_created_at")
+  @@index([userId], map: "idx_activity_logs_user_id")
+  @@map("activity_logs")
+}
+
+model WebsiteContent {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  contentType String    @map("content_type") @db.String(50)
+  contentKey  String    @map("content_key") @db.String(100)
+  title       String?
+  content     String?
+  metadata    Json?
+  isActive    Boolean?  @default(true) @map("is_active")
+  createdById String?   @map("created_by") @db.Uuid
+  updatedById String?   @map("updated_by") @db.Uuid
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdBy   User?     @relation("CreatedContent", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedBy   User?     @relation("UpdatedContent", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([contentType, contentKey])
+  @@map("website_content")
+}
+
+model Benefit {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String    @db.String(255)
+  description String?
+  icon        String?   @db.String(100)
+  orderIndex  BigInt?   @default(0) @map("order_index")
+  isActive    Boolean?  @default(true) @map("is_active")
+  createdById String?   @map("created_by") @db.Uuid
+  updatedById String?   @map("updated_by") @db.Uuid
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdBy   User?     @relation("CreatedBenefit", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedBy   User?     @relation("UpdatedBenefit", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([isActive], map: "idx_benefits_active")
+  @@index([orderIndex], map: "idx_benefits_order")
+  @@map("benefits")
+}
+
+model Testimonial {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String    @db.String(100)
+  designation String?   @db.String(100)
+  content     String
+  rating      BigInt?   @default(5)
+  imageUrl    String?   @map("image_url")
+  isFeatured  Boolean?  @default(false) @map("is_featured")
+  orderIndex  BigInt?   @default(0) @map("order_index")
+  isActive    Boolean?  @default(true) @map("is_active")
+  // New fields for TEF testimonials
+  initials    String?   @db.String(10)
+  score       String?   @db.String(100)
+  batch       String?   @db.String(100)
+  linkedin    String?   @db.String(500)
+  createdById String?   @map("created_by") @db.Uuid
+  updatedById String?   @map("updated_by") @db.Uuid
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdBy   User?     @relation("CreatedTestimonial", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedBy   User?     @relation("UpdatedTestimonial", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([isActive], map: "idx_testimonials_active")
+  @@index([isFeatured], map: "idx_testimonials_featured")
+  @@index([orderIndex], map: "idx_testimonials_order")
+  @@map("testimonials")
+}
+
+model Faq {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  question    String
+  answer      String
+  category    String?   @default("general") @db.String(50)
+  orderIndex  BigInt?   @default(0) @map("order_index")
+  isActive    Boolean?  @default(true) @map("is_active")
+  createdById String?   @map("created_by") @db.Uuid
+  updatedById String?   @map("updated_by") @db.Uuid
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdBy   User?     @relation("CreatedFaq", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedBy   User?     @relation("UpdatedFaq", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([category], map: "idx_faqs_category")
+  @@map("faqs")
+}
+
+model PricingPlan {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String    @db.String(255)
+  price       String    @db.String(50)
+  badge       String?   @db.String(100)
+  features    String[]
+  buttonText  String    @map("button_text") @db.String(100)
+  buttonType  String?   @default("general") @map("button_type") @db.String(20)
+  buttonUrl   String?   @map("button_url")
+  isPopular   Boolean?  @default(false) @map("is_popular")
+  orderIndex  BigInt?   @default(0) @map("order_index")
+  isActive    Boolean?  @default(true) @map("is_active")
+  createdById String?   @map("created_by") @db.Uuid
+  updatedById String?   @map("updated_by") @db.Uuid
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdBy   User?     @relation("CreatedPricing", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedBy   User?     @relation("UpdatedPricing", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("pricing_plans")
+}
+
+model BlogPost {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title            String    @db.String(255)
+  slug             String    @unique @db.String(255)
+  excerpt          String?
+  content          String
+  category         String    @db.String(50)
+  status           String?   @default("draft") @db.String(20)
+  featuredImageUrl String?   @map("featured_image_url")
+  seoTitle         String?   @map("seo_title") @db.String(255)
+  seoDescription   String?   @map("seo_description")
+  seoKeywords      String?   @map("seo_keywords")
+  viewCount        BigInt?   @default(0) @map("view_count")
+  createdById      String?   @map("created_by") @db.Uuid
+  updatedById      String?   @map("updated_by") @db.Uuid
+  publishedAt      DateTime? @map("published_at") @db.Timestamp(6)
+  createdAt        DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdBy        User?     @relation("CreatedBlog", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedBy        User?     @relation("UpdatedBlog", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([createdAt], map: "idx_blog_posts_created_at")
+  @@index([slug], map: "idx_blog_posts_slug")
+  @@index([status], map: "idx_blog_posts_status")
+  @@map("blog_posts")
+}
+
+model SeoSetting {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  pageType       String    @map("page_type") @db.String(50)
+  pageIdentifier String?   @map("page_identifier") @db.String(100)
+  title          String?   @db.String(255)
+  description    String?
+  keywords       String?
+  ogTitle        String?   @map("og_title") @db.String(255)
+  ogDescription  String?   @map("og_description")
+  ogImageUrl     String?   @map("og_image_url")
+  twitterCard    String?   @map("twitter_card") @db.String(50)
+  canonicalUrl   String?   @map("canonical_url")
+  createdById    String?   @map("created_by") @db.Uuid
+  updatedById    String?   @map("updated_by") @db.Uuid
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdBy      User?     @relation("CreatedSeo", fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedBy      User?     @relation("UpdatedSeo", fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([pageType, pageIdentifier])
+  @@map("seo_settings")
+}
+
+model Setting {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  settingKey   String    @unique @map("setting_key") @db.String(100)
+  settingValue String?   @map("setting_value")
+  settingType  String?   @default("text") @map("setting_type") @db.String(50)
+  description  String?
+  updatedById  String?   @map("updated_by") @db.Uuid
+  updatedAt    DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  updatedBy    User?     @relation(fields: [updatedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("settings")
+}
+
+model VisitorAnalytics {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  pageUrl       String?   @map("page_url") @db.String(500)
+  pageTitle     String?   @map("page_title") @db.String(255)
+  visitorIp     String?   @map("visitor_ip") @db.Inet
+  userAgent     String?   @map("user_agent")
+  referrer      String?   @db.String(500)
+  country       String?   @db.String(100)
+  city          String?   @db.String(100)
+  deviceType    String?   @map("device_type") @db.String(50)
+  browser       String?   @db.String(100)
+  os            String?   @db.String(100)
+  sessionId     String?   @map("session_id") @db.String(100)
+  visitDuration BigInt?   @map("visit_duration")
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@map("visitor_analytics")
+}
+
+model ContactSubmission {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String    @db.String(100)
+  email           String    @db.String(100)
+  phone           String?   @db.String(20)
+  message         String?
+  programInterest String?   @map("program_interest") @db.String(100)
+  status          String?   @default("new") @db.String(20)
+  notes           String?
+  createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@map("contact_submissions")
+}
+
+model WhatsappInteraction {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  phoneNumber     String?   @map("phone_number") @db.String(20)
+  interactionType String?   @map("interaction_type") @db.String(50)
+  pageUrl         String?   @map("page_url") @db.String(500)
+  visitorIp       String?   @map("visitor_ip") @db.Inet
+  createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@map("whatsapp_interactions")
+}
+
+model FileUpload {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  originalName String    @map("original_name") @db.String(255)
+  fileName     String    @map("file_name") @db.String(255)
+  filePath     String    @map("file_path")
+  file_size    BigInt?
+  mimeType     String?   @map("mime_type") @db.String(100)
+  uploadedById String?   @map("uploaded_by") @db.Uuid
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  uploadedBy   User?     @relation(fields: [uploadedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("file_uploads")
+}
+
+model AuthorizedDevice {
+  id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  deviceFingerprint String    @map("device_fingerprint") @db.String(500)
+  deviceName        String?   @map("device_name") @db.String(255)
+  ipAddress         String?   @map("ip_address") @db.Inet
+  description       String?   @db.String(500)
+  isActive          Boolean?  @default(true) @map("is_active")
+  lastAccess        DateTime? @map("last_access") @db.Timestamp(6)
+  authorizedById    String?   @map("authorized_by") @db.Uuid
+  createdAt         DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt         DateTime? @default(now()) @map("updated_at") @db.Timestamp(6)
+  authorizedBy      User?     @relation("AuthorizedDevices", fields: [authorizedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([deviceFingerprint])
+  @@index([lastAccess])
+  @@map("authorized_devices")
+}

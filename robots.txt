@@ -1,0 +1,50 @@
+# Robots.txt for Language Baba - TEF Canada Preparation Platform
+# https://languagebaba.live
+
+# Allow all search engines to crawl public content
+User-agent: *
+Allow: /
+Allow: /blog.html
+Allow: /privacy.html
+Allow: /public/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.ico
+
+# Disallow admin panel and sensitive areas
+Disallow: /admin.html
+Disallow: /admin-script.js
+Disallow: /admin-style.css
+Disallow: /server.js
+Disallow: /database-prisma.js
+Disallow: /prisma/
+Disallow: /node_modules/
+Disallow: /.env
+Disallow: /package.json
+Disallow: /package-lock.json
+
+# Disallow API endpoints (except public ones)
+Disallow: /api/
+Allow: /api/blog
+Allow: /api/testimonials
+Allow: /api/pricing
+
+# Disallow temporary and test files
+Disallow: /*.log
+Disallow: /tmp/
+Disallow: /temp/
+
+# Crawl delay (optional - helps prevent server overload)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://languagebaba.live/sitemap.xml
+
+# Additional sitemaps (if you have multiple)
+# Sitemap: https://languagebaba.live/blog-sitemap.xml
+# Sitemap: https://languagebaba.live/images-sitemap.xml

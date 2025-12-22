@@ -1,0 +1,5 @@
+# Redirects for Language Baba
+/blog.html    /blog.html    200
+/privacy.html /privacy.html 200
+/admin.html   /admin.html   200
+/api/*        /server.js    200
