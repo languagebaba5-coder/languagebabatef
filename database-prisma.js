@@ -401,19 +401,30 @@ class DatabasePrisma {
     }
 
     async updatePricingPlan(id, planData, userId) {
-        const plan = await this.prisma.pricingPlan.update({
-            where: { id },
-            data: {
-                ...planData,
-                updatedById: userId
-            }
-        });
+        try {
+            console.log('Updating pricing plan:', { id, planData, userId });
+            
+            const plan = await this.prisma.pricingPlan.update({
+                where: { id },
+                data: {
+                    ...planData,
+                    updatedById: userId,
+                    updatedAt: new Date()
+                }
+            });
 
-        // Convert BigInt to Number for JSON serialization
-        return {
-            ...plan,
-            orderIndex: plan.orderIndex ? Number(plan.orderIndex) : 0
-        };
+            // Convert BigInt to Number for JSON serialization
+            return {
+                ...plan,
+                orderIndex: plan.orderIndex ? Number(plan.orderIndex) : 0
+            };
+        } catch (error) {
+            console.error('Error in updatePricingPlan:', error);
+            console.error('Plan data received:', planData);
+            console.error('Error code:', error.code);
+            console.error('Error meta:', error.meta);
+            throw error;
+        }
     }
 
     async deletePricingPlan(id) {

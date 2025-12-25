@@ -757,13 +757,32 @@ app.put('/api/pricing-plans/:id', authenticateToken, checkPermission('pricing', 
             buttonText
         };
 
-        // Add optional fields only if they exist
-        if (badge !== undefined && badge !== null) planData.badge = badge;
-        if (buttonType !== undefined && buttonType !== null) planData.buttonType = buttonType;
-        if (buttonUrl !== undefined && buttonUrl !== null) planData.buttonUrl = buttonUrl;
-        if (isPopular !== undefined) planData.isPopular = Boolean(isPopular);
-        if (orderIndex !== undefined && orderIndex !== null) planData.orderIndex = BigInt(orderIndex);
+        // Add optional fields only if they exist and are not empty strings
+        // Convert empty strings to null for optional fields
+        if (badge !== undefined && badge !== null && badge !== '') {
+            planData.badge = badge;
+        } else if (badge === '') {
+            planData.badge = null;
+        }
 
+        if (buttonType !== undefined && buttonType !== null && buttonType !== '') {
+            planData.buttonType = buttonType;
+        }
+
+        if (buttonUrl !== undefined && buttonUrl !== null && buttonUrl !== '') {
+            planData.buttonUrl = buttonUrl;
+        } else if (buttonUrl === '') {
+            planData.buttonUrl = null;
+        }
+
+        if (isPopular !== undefined) {
+            planData.isPopular = Boolean(isPopular);
+        }
+
+        // Don't include orderIndex in update to avoid type issues
+        // The existing orderIndex will be preserved
+
+        console.log('Sending to database:', planData);
         const plan = await db.updatePricingPlan(req.params.id, planData, req.user.id);
         await db.logActivity(req.user.id, 'pricing', 'Pricing plan updated', `"${plan.title}" plan updated`, 'info');
         res.json(plan);

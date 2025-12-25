@@ -1405,14 +1405,43 @@ class AdminPanel {
     }
 
     // Pricing Management
-    loadPricing() {
-        const container = document.getElementById('pricing-list');
-        container.innerHTML = '';
+    async loadPricing() {
+        try {
+            const container = document.getElementById('pricing-list');
+            container.innerHTML = '<div style="text-align: center; padding: 20px;">Loading pricing plans...</div>';
 
-        this.data.pricing.forEach(plan => {
-            const item = this.createPricingItem(plan);
-            container.appendChild(item);
-        });
+            // Fetch pricing plans from the database API
+            const response = await this.requestMiddleware('/api/pricing-plans');
+
+            if (response && response.ok) {
+                const plans = await response.json();
+                this.data.pricing = plans; // Update local data
+                this.saveData(); // Save to localStorage as backup
+
+                container.innerHTML = '';
+                plans.forEach(plan => {
+                    const item = this.createPricingItem(plan);
+                    container.appendChild(item);
+                });
+            } else {
+                // Fallback to localStorage if API fails
+                console.warn('Failed to fetch pricing plans from API, using localStorage');
+                container.innerHTML = '';
+                this.data.pricing.forEach(plan => {
+                    const item = this.createPricingItem(plan);
+                    container.appendChild(item);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading pricing plans:', error);
+            // Fallback to localStorage
+            const container = document.getElementById('pricing-list');
+            container.innerHTML = '';
+            this.data.pricing.forEach(plan => {
+                const item = this.createPricingItem(plan);
+                container.appendChild(item);
+            });
+        }
     }
 
     createPricingItem(plan) {
